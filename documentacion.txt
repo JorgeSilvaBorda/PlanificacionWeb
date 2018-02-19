@@ -4,4 +4,6 @@ http://www.guriddo.net/demo/treegridjs/
 
 La base de datos de access debe quedar en :
 c:\tomcat7\base.mdb
+El archivo MDB se incluye en el repositorio de fuentes para ser ubicado.
+Luego se revisará la manera de mantenerlo en la aplicación.
 Evaluar la posibilidad de incluirla en el classpath de la aplicacion
