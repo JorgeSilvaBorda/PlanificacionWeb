@@ -1,0 +1,7 @@
+
+Revisar para ver el grid json
+http://www.guriddo.net/demo/treegridjs/
+
+La base de datos de access debe quedar en :
+c:\tomcat7\base.mdb
+Evaluar la posibilidad de incluirla en el classpath de la aplicacion
