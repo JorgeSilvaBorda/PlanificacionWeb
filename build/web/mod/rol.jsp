@@ -23,7 +23,7 @@
         var datos = JSON.stringify(dat);
 
         $.ajax({
-            url: "Conector",
+            url: "Roles",
             type: 'post',
             data: {
                 datos: datos
@@ -53,7 +53,7 @@
         var datos = JSON.stringify(dat);
 
         $.ajax({
-            url: "Conector",
+            url: "Roles",
             type: 'post',
             data: {
                 datos: datos
@@ -92,7 +92,7 @@
 
         var datos = JSON.stringify(dat);
         $.ajax({
-            url: 'Conector',
+            url: 'Roles',
             type: 'post',
             data: {
                 datos: datos
@@ -123,7 +123,7 @@
         console.log(dat);
         var datos = JSON.stringify(dat);
         $.ajax({
-            url: 'Conector',
+            url: 'Roles',
             type: 'post',
             data: {
                 datos: datos
@@ -184,7 +184,7 @@
         };
         var datos = JSON.stringify(dat);
         $.ajax({
-            url: 'Conector',
+            url: 'Roles',
             type: 'post',
             data: {
                 datos: datos

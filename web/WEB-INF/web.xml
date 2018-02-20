@@ -1,12 +1,52 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <web-app version="3.0" xmlns="http://java.sun.com/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd">
     <servlet>
-        <servlet-name>Conector</servlet-name>
-        <servlet-class>Conector</servlet-class>
+        <servlet-name>Etapas</servlet-name>
+        <servlet-class>Etapas</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>Proyectos</servlet-name>
+        <servlet-class>Proyectos</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>Otros</servlet-name>
+        <servlet-class>Otros</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>Recursos</servlet-name>
+        <servlet-class>Recursos</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>Roles</servlet-name>
+        <servlet-class>Roles</servlet-class>
+    </servlet>
+    <servlet>S
+        <servlet-name>Clientes</servlet-name>
+        <servlet-class>Clientes</servlet-class>
     </servlet>
     <servlet-mapping>
-        <servlet-name>Conector</servlet-name>
-        <url-pattern>/Conector</url-pattern>
+        <servlet-name>Proyectos</servlet-name>
+        <url-pattern>/Proyectos</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>Otros</servlet-name>
+        <url-pattern>/Otros</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>Etapas</servlet-name>
+        <url-pattern>/Etapas</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>Recursos</servlet-name>
+        <url-pattern>/Recursos</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>Roles</servlet-name>
+        <url-pattern>/Roles</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>Clientes</servlet-name>
+        <url-pattern>/Clientes</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>
