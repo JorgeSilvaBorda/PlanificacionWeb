@@ -1,75 +1,29 @@
 <script type="text/javascript">
 
     var Proyecto = function (nombre, idCliente, fechaIni, idJefeProyecto) {
+        this.idProyecto = null;
         this.nombre = nombre;
         this.idCliente = idCliente;
         this.fechaIni = fechaIni;
         this.idJefeProyecto = idJefeProyecto;
-        this.nomCliente = getNomCliente(idCliente);
-        this.nomJefeProyecto = getNomJefeProyecto(idJefeProyecto);
         this.get = function () {
             return {
                 nombre: this.nombre,
                 idCliente: this.idCliente,
-                nomCliente: this.nomCliente,
                 fechaIni: this.fechaIni,
                 idJefeProyecto: this.idJefeProyecto,
-                nomJefeProyecto: this.nomJefeProyecto
             };
         };
+        this.set = function(pro){
+            this.nombre = pro.nombre;
+            this.idCliente = pro.idCliente;
+            this.fechaIni = formatDate(pro.fechaIni);
+            this.idJefeProyecto = pro.idJefeProyecto;
+        };
+        this.setIdProyecto = function(idProyecto){
+            this.idProyecto = idProyecto;
+        };
     };
-
-    function getNomCliente(idCliente) {
-        var salida;
-        var dat = {
-            tipo: 'getNomClienteId',
-            idCliente: idCliente
-        };
-        var datos = JSON.stringify(dat);
-        $.ajax({
-            type: 'post',
-            url: 'Otros',
-            data: {
-                datos: datos
-            },
-            success: function (resp) {
-                var obj = JSON.parse(resp);
-                if (obj.estado === 'ok') {
-                    salida = obj.nombre;
-                    return salida;
-                } else {
-                    console.log("No se puede obtener el nombre del cliente.");
-                }
-            }
-        });
-        return salida;
-    }
-
-    function getNomJefeProyecto(idJefeProyecto) {
-        var salida = "";
-        var dat = {
-            tipo: 'getNomJefeProyectoId',
-            idJefeProyecto: idJefeProyecto
-        };
-        var datos = JSON.stringify(dat);
-        $.ajax({
-            type: 'post',
-            url: 'Otros',
-            data: {
-                datos: datos
-            },
-            success: function (resp) {
-                var obj = JSON.parse(resp);
-                if (obj.estado === 'ok') {
-                    salida = obj.nombre;
-                    return salida;
-                } else {
-                    console.log("No se puede obtener el nombre del jefe de proyecto.");
-                }
-            }
-        });
-        return salida;
-    }
 
     $(document).ready(function () {
         cargarProyectos();
@@ -83,11 +37,22 @@
         };
         var datos = JSON.stringify(dat);
         $.ajax({
-
+            url: 'Proyectos',
+            type: 'post',
+            data: {
+                datos: datos
+            },
+            success: function(resp){
+                var obj = JSON.parse(resp);
+                if(obj.estado === 'ok'){
+                    $('#cuerpo-proyectos').html(obj.tabla);
+                }else{
+                    console.log("No se puede cargar los proyectos.");
+                }
+            }
         });
     }
 
-    var PROJ;
     function crearProyecto() {
         var proyecto = new Proyecto(
                 $('#nombre').val(),
@@ -95,11 +60,11 @@
                 $('#fechaini').val(),
                 $('#jefeproyecto').val()
                 );
-        PROJ = proyecto;
         var datos = JSON.stringify({
             tipo: 'ingresarProyecto',
             proyecto: proyecto.get()
         });
+        console.log(datos);
         $.ajax({
             url: 'Proyectos',
             type: 'post',
@@ -109,7 +74,8 @@
             success: function(resp){
                 var obj = JSON.parse(resp);
                 if(obj.estado === 'ok'){
-                    
+                    cargarProyectos();
+                    limpiar();
                 }else{
                     console.log("No se puede ingresar el proyecto")
                 }
@@ -118,7 +84,35 @@
     }
 
     function grabarProyecto() {
-
+        var pro = {
+            idProyecto: $('#idProyecto').val(),
+            nombre: $('#nombre').val(),
+            idCliente: $('#cliente').val(),
+            fechaIni: $('#fechaini').val(),
+            idJefeProyecto: $('#jefeproyecto').val()
+        };
+        var dat = {
+            tipo: "guardarProyecto",
+            proyecto: pro
+        };
+        
+        var datos = JSON.stringify(dat);
+        $.ajax({
+            type: 'post',
+            url: 'Proyectos',
+            data: {
+                datos: datos
+            },
+            success: function(resp){
+                var obj = JSON.parse(resp);
+                if(obj.estado === 'ok'){
+                    cargarProyectos();
+                    limpiar();
+                }else{
+                    console.log("Error al guardar el proyecto");
+                }
+            }
+        });
     }
 
     function accion() {
@@ -189,14 +183,79 @@
         cargarCombo("cliente");
         cargarCombo("jefeproyecto");
         $('#fechaini').val('');
+        $('#idProyecto').val('');
 
         $('#btnAccion').removeClass('btn-default');
         $('#btnAccion').removeClass('btn-warning');
         $('#btnAccion').addClass('btn-default');
     }
+    
+    function montarProyecto(pro){
+        $('#nombre').val(pro.nombre);
+        $('#fechaini').val(pro.fechaIni);
+        $('#cliente').val(pro.idCliente);
+        $('#jefeproyecto').val(pro.idJefeProyecto);
+    }
+    
+    function edicionProyecto(id){
+        $('#idProyecto').val(id);
+        var dat = {
+            tipo: 'getProyectoId',
+            idProyecto: id
+        };
+        var datos = JSON.stringify(dat);
+        $.ajax({
+            url: 'Proyectos',
+            type: 'post',
+            data: {
+                datos: datos
+            },
+            success: function(resp){
+                var obj = JSON.parse(resp);
+                if(obj.estado === 'ok'){
+                    var pro = new Proyecto();
+                    pro.set(obj.proyecto);
+                    pro.setIdProyecto($('#idProyecto').val());
+                    montarProyecto(pro);
+                    $('#btnAccion').text('Grabar');
+                    $('#btnAccion').removeClass('btn-default');
+                    $('#btnAccion').removeClass('btn-warning');
+                    $('#btnAccion').addClass('btn-warning');
+                }else{
+                    console.log("No se puede cargar la edición del proyecto");
+                }
+            }
+        });
+    }
+    
+    function eliminarProyecto(id){
+        var dat = {
+            tipo: "eliminarProyecto",
+            idProyecto: id
+        };
+        var datos = JSON.stringify(dat);
+        $.ajax({
+            url: 'Proyectos',
+            type: 'post',
+            data: {
+                datos: datos
+            },
+            success: function(resp){
+                var obj = JSON.parse(resp);
+                if(obj.estado === 'ok'){
+                    cargarProyectos();
+                    limpiar();
+                }else{
+                    console.log("No se pudo eliminar el proyecto");
+                }
+            }
+        });
+    }
+    
 </script>
 
 <div class="container-fluid">
+    <input id="idProyecto" type="hidden" value="" />
     <div class="row">
         <div class="col-md-12">
             <div class="page-header">

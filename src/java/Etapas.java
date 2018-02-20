@@ -19,32 +19,23 @@ public class Etapas extends HttpServlet {
 	PrintWriter out = response.getWriter();
 
 	JSONObject entrada = new JSONObject(request.getParameter("datos"));
-	System.out.println("Al comienzo:");
-	System.out.println(entrada);
-	try {
-
-	    switch (entrada.getString("tipo")) {
-		case "cargarEtapas":
-		    out.print(cargarEtapas());
-		    break;
-		case "getEtapaId":
-		    out.print(getEtapaId(entrada.getString("idEtapa")));
-		    break;
-		case "insertarEtapa":
-		    out.print(insertarEtapa(entrada));
-		    break;
-		case "grabarEtapa":
-		    out.print(grabarEtapa(entrada));
-		    break;
-		case "eliminarEtapa":
-		    out.print(eliminarEtapa(entrada));
-		    break;
-	    }
-	} catch (JSONException ex) {
-	    System.out.println("Error en dispatch");
-	    System.out.println(ex);
+	switch (entrada.getString("tipo")) {
+	    case "cargarEtapas":
+		out.print(cargarEtapas());
+		break;
+	    case "getEtapaId":
+		out.print(getEtapaId(entrada.getString("idEtapa")));
+		break;
+	    case "insertarEtapa":
+		out.print(insertarEtapa(entrada));
+		break;
+	    case "grabarEtapa":
+		out.print(grabarEtapa(entrada));
+		break;
+	    case "eliminarEtapa":
+		out.print(eliminarEtapa(entrada));
+		break;
 	}
-
     }
 
     public JSONObject cargarEtapas() {

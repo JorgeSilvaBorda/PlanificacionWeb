@@ -45,7 +45,9 @@ public class Otros extends HttpServlet {
 	    while (rs.next()) {
 		salida.append("nombre", rs.getString("NOMBRECLIENTE"));
 	    }
-	    salida.append("estado", "ok");
+	    salida.put("estado", "ok");
+	    System.out.println("Salida de getNomClienteId:");
+	    System.out.println(salida);
 	    return salida;
 	} catch (SQLException | JSONException ex) {
 	    System.out.println("No se puede obtener el nombre del cliente por ID");
@@ -57,6 +59,7 @@ public class Otros extends HttpServlet {
     }
 
     public JSONObject getNomJefeProyectoId(JSONObject json) {
+	System.out.println(json);
 	String query = "SELECT * FROM RECURSO WHERE ID = " + json.getString("idJefeProyecto");
 	Conexion c = new Conexion();
 	ResultSet rs = c.ejecutarQuery(query);
@@ -65,13 +68,13 @@ public class Otros extends HttpServlet {
 	    while (rs.next()) {
 		salida.append("nombre", rs.getString("NOMBRE"));
 	    }
-	    salida.append("estado", "ok");
+	    salida.put("estado", "ok");
 	    return salida;
 	} catch (SQLException | JSONException ex) {
 	    System.out.println("No se puede obtener el nombre del jefe de proyecto por ID");
 	    System.out.println(ex);
-	    salida.append("estado", "error");
-	    salida.append("error", ex);
+	    salida.put("estado", "error");
+	    salida.put("error", ex);
 	    return salida;
 	}
     }
