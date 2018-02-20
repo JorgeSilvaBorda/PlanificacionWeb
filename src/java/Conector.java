@@ -37,7 +37,7 @@ public class Conector extends HttpServlet {
 	    case "eliminarRecurso":
 		out.print(eliminarRecurso(entrada));
 		break;
-		//ROLES-------------------------------------------------------------
+	    //ROLES-------------------------------------------------------------
 	    case "cargarRoles":
 		out.print(cargarRoles());
 		break;
@@ -53,7 +53,7 @@ public class Conector extends HttpServlet {
 	    case "eliminarRol":
 		out.print(eliminarRol(entrada));
 		break;
-		//ETAPAS-------------------------------------------------------------
+	    //ETAPAS-------------------------------------------------------------
 	    case "cargarEtapas":
 		out.print(cargarEtapas());
 		break;
@@ -69,7 +69,7 @@ public class Conector extends HttpServlet {
 	    case "eliminarEtapa":
 		out.print(eliminarEtapa(entrada));
 		break;
-		//CLIENTES-------------------------------------------------------------
+	    //CLIENTES-------------------------------------------------------------
 	    case "cargarClientes":
 		out.print(cargarClientes());
 		break;
@@ -84,6 +84,10 @@ public class Conector extends HttpServlet {
 		break;
 	    case "eliminarCliente":
 		out.print(eliminarCliente(entrada));
+		break;
+	    //COMBOS------------------------------------------------------------
+	    case "cargarCombo":
+		out.print(cargarCombo(entrada));
 		break;
 	}
     }
@@ -507,5 +511,21 @@ public class Conector extends HttpServlet {
 	return salida;
     }
 
+    //</editor-fold>
+    
+    //<editor-fold desc="COMBOS" defaultstate="collapsed">
+    public JSONObject cargarCombo(JSONObject json){
+	JSONObject salida = new JSONObject();
+	String combo = "";
+	switch(json.getString("cual")){
+	    case "cliente": combo = Util.armarCombo("Seleccione", "0", "NOMBRECLIENTE", "ID", "SELECT * FROM CLIENTE");
+		break;
+	    case "jefeproyecto": combo = Util.armarCombo("Seleccione", "0", "NOMBRE", "ID", "SELECT * FROM RECURSO");
+		break;
+	}
+	salida.put("estado", "ok");
+	salida.put("combo", combo);
+	return salida;
+    }
     //</editor-fold>
 }
