@@ -38,6 +38,15 @@ public class Proyectos extends HttpServlet {
 	    case "eliminarProyecto":
 		out.print(eliminarProyecto(entrada.getString("idProyecto")));
 		break;
+	    case "traerEtapas":
+		out.print(traerEtapas(Integer.toString(entrada.getInt("idProyecto"))));
+		break;
+	    case "eliminarEtapaProyecto":
+		out.print(eliminarEtapaProyecto(entrada.getString("idEtapaProyecto")));
+		break;
+	    case "agregarEtapaProyecto":
+		out.print(agregarEtapaProyecto(entrada.getJSONObject("etapa")));
+		break;
 	}
     }
 
@@ -83,9 +92,10 @@ public class Proyectos extends HttpServlet {
 		tabla += "<td>" + rs.getObject("NOMBRECLIENTE") + "</td>";
 		tabla += "<td>" + rs.getObject("FECHAINI") + "</td>";
 		tabla += "<td>" + rs.getObject("NOMJP") + "</td>";
-		tabla += "<td style='width: 120px;' class='text-center'>"
+		tabla += "<td style='width: 160px;' class='text-center'>"
 			+ "<div class=\"btn-group\">\n"
 			+ "  <button onclick='edicionProyecto(\"" + rs.getObject("ID") + "\");' type=\"button\" class=\"btn btn-primary btn-xs\">Editar</button>\n"
+			+ "  <button onclick='etapasProyecto(this);' type=\"button\" class=\"btn btn-success btn-xs\">Etapas</button>\n"
 			+ "  <button onclick='eliminarProyecto(\"" + rs.getObject("ID") + "\");' type=\"button\" class=\"btn btn-danger btn-xs\">Eliminar</button>\n"
 			+ "</div>"
 			+ "</td>";
@@ -142,6 +152,171 @@ public class Proyectos extends HttpServlet {
 
     public JSONObject eliminarProyecto(String id) {
 	String query = "UPDATE PROYECTO SET ACTIVO = 0 WHERE ID = " + id;
+	new Conexion().ejecutarUpdate(query);
+	JSONObject salida = new JSONObject();
+	salida.put("estado", "ok");
+	return salida;
+    }
+
+    public JSONObject traerEtapas(String idProyecto) {
+	String query = "SELECT\n"
+		+ "	A.ID AS IDPROYECTO,\n"
+		+ "	A.NOMBRE,\n"
+		+ "	B.ID AS IDETAPAPROYECTO,\n"
+		+ "	B.FECHAINI,\n"
+		+ "	B.FECHAFIN,\n"
+		+ "	B.IDETAPA,\n"
+		+ "	B.NUMETAPA,\n"
+		+ "	C.NOMBREETAPA\n"
+		+ "FROM	\n"
+		+ "	PROYECTO A INNER JOIN ETAPAPROYECTO B\n"
+		+ "	ON A.ID = B.IDPROYECTO INNER JOIN ETAPA C\n"
+		+ "	ON B.IDETAPA = C.ID\n"
+		+ "WHERE\n"
+		+ "	B.IDPROYECTO = " + idProyecto + "\n"
+		+ "ORDER BY\n"
+		+ "	B.FECHAINI ASC";
+	ResultSet rs = new Conexion().ejecutarQuery(query);
+	String tabla = "<table class=\"table table-hover table-condensed table-striped small\">";
+	tabla += "<thead>";
+	tabla += "<tr>\n"
+		+ "<th>#</th>"
+		+ "<th>ETAPA</th>\n"
+		+ "<th>FECHA INICIO</th>\n"
+		+ "<th>FECHA FIN</th>\n"
+		+ "<th>ACCIONES</th>\n"
+		+ "</tr>";
+	JSONObject salida = new JSONObject();
+	salida.put("combo", genComboEtapas(idProyecto));
+	int cont = 0;
+	try {
+	    while (rs.next()) {
+		String fechaIni, fechaFin;
+		fechaIni = rs.getString("FECHAINI");
+		fechaFin = rs.getString("FECHAFIN");
+		fechaIni = fechaIni.substring(0, 10);
+		fechaFin = fechaFin.substring(0, 10);
+		
+		fechaIni = fechaIni.split("-")[2] + "-" + fechaIni.split("-")[1] + "-" + fechaIni.split("-")[0];
+		fechaFin = fechaFin.split("-")[2] + "-" + fechaFin.split("-")[1] + "-" + fechaFin.split("-")[0];
+		tabla += "<tr>";
+		tabla += "<td><input type='hidden' value='" + rs.getString("IDETAPAPROYECTO") + "' />" + Integer.toString(cont + 1) + "</td>";
+		tabla += "<td>" + rs.getString("NOMBREETAPA") + "</td>";
+		tabla += "<td>" + fechaIni + "</td>";
+		tabla += "<td>" + fechaFin + "</td>";
+		/*
+		tabla += "<td>" + rs.getString("FECHAINI").split("-")[0] + "-" + rs.getString("FECHAINI").split("-")[1] + "-" + rs.getString("FECHAINI").split("-")[2] + "</td>";
+		tabla += "<td>" + rs.getString("FECHAFIN").split("-")[0] + "-" + rs.getString("FECHAFIN").split("-")[1] + "-" + rs.getString("FECHAFIN").split("-")[2] + "</td>";
+		 */
+		tabla += "<td style='width: 100px;' class='text-center'>"
+			+ "<div class=\"btn-group\">\n"
+			+ "  <button onclick='eliminarEtapaProyecto(\"" + rs.getObject("IDETAPAPROYECTO") + "\", \"" + rs.getObject("IDPROYECTO") + "\");' type=\"button\" class=\"btn btn-danger btn-xs\">Eliminar</button>\n"
+			+ "</div>"
+			+ "</td>";
+		cont++;
+	    }
+	    salida.put("registros", cont);
+	    salida.put("tabla", tabla);
+	    salida.put("estado", "ok");
+	} catch (SQLException | JSONException ex) {
+	    salida.put("estado", "error");
+	    salida.put("error", ex);
+	    System.out.println("No se puede obtener las etapas del proyecto.");
+	    System.out.println(ex);
+	}
+	return salida;
+    }
+
+    private String genComboEtapas(String idProyecto) {
+	String query = "SELECT\n"
+		+ "	*\n"
+		+ "FROM\n"
+		+ "	ETAPA\n"
+		+ "WHERE\n"
+		+ "	ID NOT IN(\n"
+		+ "	SELECT\n"
+		+ "		B.IDETAPA\n"
+		+ "	FROM	\n"
+		+ "		PROYECTO A INNER JOIN ETAPAPROYECTO B\n"
+		+ "		ON A.ID = B.IDPROYECTO INNER JOIN ETAPA C\n"
+		+ "		ON B.IDETAPA = C.ID\n"
+		+ "	WHERE\n"
+		+ "		B.IDPROYECTO = " + idProyecto
+		+ "	)";
+	ResultSet rs = new Conexion().ejecutarQuery(query);
+	String contenido = "<div class='row'>\n"
+		+ "        <input id='idProyectoEdicion' type='hidden' value='" + idProyecto + "'>\n"
+		+ "        <div class='col-sm-8'>\n"
+		+ "            <div class='form-group-sm'>\n"
+		+ "                <select id='etapas' class='form-control'>##contenido-select##</select>\n"
+		+ "            </div>\n"
+		+ "        </div>\n"
+		+ "        <div class='col-sm-4'>\n"
+		+ "            <div class='form-group-sm'>\n"
+		+ "                <button type='button' class='btn btn-success btn-sm' onclick='agregarEtapaProyecto()'>Agregar</button>\n"
+		+ "            </div>\n"
+		+ "        </div>\n"
+		+ "    </div>"
+		+ "<div class='row'>\n"
+		+ "    <div class='col-sm-4'>\n"
+		+ "        <div class='form-group-sm'>\n"
+		+ "            <label for='fechaIniEtapa'>Fecha inicio</label>\n"
+		+ "            <input id='fechaIniEtapa' type='date' class='form-control'/>\n"
+		+ "        </div>\n"
+		+ "        \n"
+		+ "    </div>\n"
+		+ "    <div class='col-sm-4'>\n"
+		+ "        <div class='form-group-sm'>\n"
+		+ "            <label for='fechaFinEtapa'>Fecha fin</label>\n"
+		+ "            <input id='fechaFinEtapa' type='date' class='form-control'/>\n"
+		+ "        </div>\n"
+		+ "    </div>\n"
+		+ "    <div class='col-sm-4'></div>\n"
+		+ "</div>";
+
+	String combo = "<option value='0'>Seleccione...</option>";
+	int cont = 0;
+	try {
+	    while (rs.next()) {
+		combo += "<option value='" + rs.getString("ID") + "' >" + rs.getString("NOMBREETAPA") + "</option>";
+		cont++;
+	    }
+	    if (cont == 0) {
+		contenido = contenido.replace("select id='etapas'", "select disabled='disabled' id='etapas'");
+		combo = combo.replace("option value='0'>Seleccione...", "option value='0'>No hay etapas disponibles");
+		contenido = contenido.replace("button type='button' class='btn btn-success btn-sm' ", "button type='button' class='btn btn-success btn-xs' disabled='disabled' ");
+		contenido = contenido.replace("id='fechaFinEtapa' type='date'", "id='fechaFin' disabled='disabled' type='date'");
+		contenido = contenido.replace("id='fechaIniEtapa' type='date'", "id='fechaIni' disabled='disabled' type='date'");
+	    }
+	    contenido = contenido.replace("##contenido-select##", combo);
+	    return contenido;
+	} catch (SQLException ex) {
+	    System.out.println("No se puede obtener el listado de etapas");
+	    System.out.println(ex);
+	}
+	return "";
+    }
+
+    public JSONObject eliminarEtapaProyecto(String idEtapaProyecto) {
+	String query1 = "DELETE FROM ETAPAPROYECTOPERSONAL WHERE ID = " + idEtapaProyecto;
+	String query2 = "DELETE FROM ETAPAPROYECTO WHERE ID = " + idEtapaProyecto;
+	new Conexion().ejecutarUpdate(query1);
+	new Conexion().ejecutarUpdate(query2);
+	JSONObject salida = new JSONObject();
+	salida.put("estado", "ok");
+	return salida;
+    }
+    
+    public JSONObject agregarEtapaProyecto(JSONObject etapa){
+	java.sql.Date dtIni = java.sql.Date.valueOf(etapa.getString("fechaIni"));
+	java.sql.Date dtFin = java.sql.Date.valueOf(etapa.getString("fechaFin"));
+	String query = "INSERT INTO ETAPAPROYECTO(FECHAINI, FECHAFIN, IDPROYECTO, IDETAPA, NUMETAPA)VALUES("
+		+ "#" + dtIni + "#,"
+		+ "#" + dtFin + "#,"
+		+ etapa.getInt("idProyecto") + ","
+		+ etapa.getInt("idEtapa") + ","
+		+ "(SELECT MAX(NUMETAPA) FROM ETAPAPROYECTO WHERE IDPROYECTO = " + etapa.getInt("idProyecto") + "))";
+	
 	new Conexion().ejecutarUpdate(query);
 	JSONObject salida = new JSONObject();
 	salida.put("estado", "ok");
