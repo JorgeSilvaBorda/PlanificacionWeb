@@ -1,10 +1,35 @@
 <script type="text/javascript">
     $(document).ready(function () {
         //Cargar grid en JSON
-        cargarGrid();
+        //cargarGrid();
+        traerTodos();
     });
 
-    function cargarGrid() {
+    function traerTodos() {
+        var dat = {
+            tipo: 'traerTodos'
+        };
+        var datos = JSON.stringify(dat);
+        $.ajax({
+            url: 'VisionGeneral',
+            type: 'post',
+            data: {
+                datos: datos
+            },
+            success: function (resp) {
+                var obj = JSON.parse(resp);
+                if (obj.estado === 'ok') {
+
+                } else {
+                    console.log(obj.error);
+                }
+            },
+            error: function (a, b, c) {
+                console.log(a);
+                console.log(b);
+                console.log(c);
+            }
+        });
     }
 
     var data = [{
@@ -14,104 +39,104 @@
             'COLJP': 'Jorge Silva Borda',
             'COLFECHAINI': '20-12-2018',
             'COLFECHAFIN': '20-12-2018',
-            'nested': [{
+            'etapas': [{
                     'COLETAPA': 'ANALISIS',
                     'COLFECHAINI': '20-12-2018',
                     'COLFECHAFIN': '23-12-2018',
-                    'other': [{
+                    'recursos': [{
                             'COLRECURSO': 'Hugo Mercado',
                             'COLPORCENTAJE': '50%',
-                            'COLEDICION': '<button type=\"button\">Editar</button>'
+                            'COLROL': '<button type=\"button\">Editar</button>'
                         },
                         {
                             'COLRECURSO': 'Jorge Silva',
                             'COLPORCENTAJE': '30%',
-                            'COLEDICION': '<button type=\"button\">Editar</button>'
+                            'COLROL': '<button type=\"button\">Editar</button>'
                         },
                         {
                             'COLRECURSO': 'Lorena González',
                             'COLPORCENTAJE': '20%',
-                            'COLEDICION': '<button type=\"button\">Editar</button>'
+                            'COLROL': '<button type=\"button\">Editar</button>'
                         }]
                 },
                 {
                     'COLETAPA': 'DISEÑO',
                     'COLFECHAINI': '20-12-2018',
                     'COLFECHAFIN': '23-12-2018',
-                    'other': [{
+                    'recuros': [{
                             'COLRECURSO': 'Hugo Mercado',
                             'COLPORCENTAJE': '50%',
-                            'COLEDICION': '<button type=\"button\">Editar</button>'
+                            'COLROL': '<button type=\"button\">Editar</button>'
                         },
                         {
                             'COLRECURSO': 'Jorge Silva',
                             'COLPORCENTAJE': '30%',
-                            'COLEDICION': '<button type=\"button\">Editar</button>'
+                            'COLROL': '<button type=\"button\">Editar</button>'
                         },
                         {
                             'COLRECURSO': 'Lorena González',
                             'COLPORCENTAJE': '20%',
-                            'COLEDICION': '<button type=\"button\">Editar</button>'
+                            'COLROL': '<button type=\"button\">Editar</button>'
                         }]
                 },
                 {
                     'COLETAPA': 'DESARROLLO',
                     'COLFECHAINI': '20-12-2018',
                     'COLFECHAFIN': '23-12-2018',
-                    'other': [{
+                    'recursos': [{
                             'COLRECURSO': 'Hugo Mercado',
                             'COLPORCENTAJE': '50%',
-                            'COLEDICION': '<button type=\"button\">Editar</button>'
+                            'COLROL': '<button type=\"button\">Editar</button>'
                         },
                         {
                             'COLRECURSO': 'Jorge Silva',
                             'COLPORCENTAJE': '30%',
-                            'COLEDICION': '<button type=\"button\">Editar</button>'
+                            'COLROL': '<button type=\"button\">Editar</button>'
                         },
                         {
                             'COLRECURSO': 'Lorena González',
                             'COLPORCENTAJE': '20%',
-                            'COLEDICION': '<button type=\"button\">Editar</button>'
+                            'COLROL': '<button type=\"button\">Editar</button>'
                         }]
                 },
                 {
                     'COLETAPA': 'PRUEBAS',
                     'COLFECHAINI': '20-12-2018',
                     'COLFECHAFIN': '23-12-2018',
-                    'other': [{
+                    'recuros': [{
                             'COLRECURSO': 'Hugo Mercado',
                             'COLPORCENTAJE': '50%',
-                            'COLEDICION': '<button type=\"button\">Editar</button>'
+                            'COLROL': '<button type=\"button\">Editar</button>'
                         },
                         {
                             'COLRECURSO': 'Jorge Silva',
                             'COLPORCENTAJE': '30%',
-                            'COLEDICION': '<button type=\"button\">Editar</button>'
+                            'COLROL': '<button type=\"button\">Editar</button>'
                         },
                         {
                             'COLRECURSO': 'Lorena González',
                             'COLPORCENTAJE': '20%',
-                            'COLEDICION': '<button type=\"button\">Editar</button>'
+                            'COLROL': '<button type=\"button\">Editar</button>'
                         }]
                 },
                 {
                     'COLETAPA': 'PRODUCCION',
                     'COLFECHAINI': '20-12-2018',
                     'COLFECHAFIN': '23-12-2018',
-                    'other': [{
+                    'recuros': [{
                             'COLRECURSO': 'Hugo Mercado',
                             'COLPORCENTAJE': '50%',
-                            'COLEDICION': '<button type=\"button\">Editar</button>'
+                            'COLROL': '<button type=\"button\">Editar</button>'
                         },
                         {
                             'COLRECURSO': 'Jorge Silva',
                             'COLPORCENTAJE': '30%',
-                            'COLEDICION': '<button type=\"button\">Editar</button>'
+                            'COLROL': '<button type=\"button\">Editar</button>'
                         },
                         {
                             'COLRECURSO': 'Lorena González',
                             'COLPORCENTAJE': '20%',
-                            'COLEDICION': '<button type=\"button\">Editar</button>'
+                            'COLROL': '<button type=\"button\">Editar</button>'
                         }]
                 }]
         }];
@@ -160,7 +185,7 @@
                             field: 'COLFECHAFIN',
                             title: 'FECHA FIN'
                         }],
-                    data: row.nested,
+                    data: row.etapas,
                     // Simple contextual, assumes all entries have further nesting
                     // Just shows example of how you might differentiate some rows, though also remember row class and similar possible flags
                     detailView: row.nested[0]['other'] !== undefined,
@@ -169,15 +194,16 @@
                             columns: [{
                                     field: 'COLRECURSO',
                                     title: 'RECURSO'
-                                }, {
+                                },
+                                {
                                     field: 'COLPORCENTAJE',
                                     title: 'PORCENTAJE'
                                 },
                                 {
-                                    field: 'COLEDICION',
-                                    title: 'ACCION'
+                                    field: 'COLROL',
+                                    title: 'ROL'
                                 }],
-                            data: rowb.other
+                            data: rowb.recursos
                         });
                     }
                 });
