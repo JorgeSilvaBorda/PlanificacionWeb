@@ -1,3 +1,5 @@
+
+
 <script type="text/javascript">
 
     var Proyecto = function (nombre, idCliente, fechaIni, idJefeProyecto) {
@@ -14,21 +16,22 @@
                 idJefeProyecto: this.idJefeProyecto,
             };
         };
-        this.set = function(pro){
+        this.set = function (pro) {
             this.nombre = pro.nombre;
             this.idCliente = pro.idCliente;
             this.fechaIni = formatDate(pro.fechaIni);
             this.idJefeProyecto = pro.idJefeProyecto;
         };
-        this.setIdProyecto = function(idProyecto){
+        this.setIdProyecto = function (idProyecto) {
             this.idProyecto = idProyecto;
         };
     };
 
     $(document).ready(function () {
-        cargarProyectos();
+        cargarProyectos();//-->llama a cargarProyectosEdicion();
         cargarCombo("cliente");
         cargarCombo("jefeproyecto");
+        //$("#modal-edicion").modal()
     });
 
     function cargarProyectos() {
@@ -42,11 +45,11 @@
             data: {
                 datos: datos
             },
-            success: function(resp){
+            success: function (resp) {
                 var obj = JSON.parse(resp);
-                if(obj.estado === 'ok'){
+                if (obj.estado === 'ok') {
                     $('#cuerpo-proyectos').html(obj.tabla);
-                }else{
+                } else {
                     console.log("No se puede cargar los proyectos.");
                 }
             }
@@ -71,12 +74,12 @@
             data: {
                 datos: datos
             },
-            success: function(resp){
+            success: function (resp) {
                 var obj = JSON.parse(resp);
-                if(obj.estado === 'ok'){
+                if (obj.estado === 'ok') {
                     cargarProyectos();
                     limpiar();
-                }else{
+                } else {
                     console.log("No se puede ingresar el proyecto")
                 }
             }
@@ -95,7 +98,7 @@
             tipo: "guardarProyecto",
             proyecto: pro
         };
-        
+
         var datos = JSON.stringify(dat);
         $.ajax({
             type: 'post',
@@ -103,12 +106,12 @@
             data: {
                 datos: datos
             },
-            success: function(resp){
+            success: function (resp) {
                 var obj = JSON.parse(resp);
-                if(obj.estado === 'ok'){
+                if (obj.estado === 'ok') {
                     cargarProyectos();
                     limpiar();
-                }else{
+                } else {
                     console.log("Error al guardar el proyecto");
                 }
             }
@@ -189,15 +192,15 @@
         $('#btnAccion').removeClass('btn-warning');
         $('#btnAccion').addClass('btn-default');
     }
-    
-    function montarProyecto(pro){
+
+    function montarProyecto(pro) {
         $('#nombre').val(pro.nombre);
         $('#fechaini').val(pro.fechaIni);
         $('#cliente').val(pro.idCliente);
         $('#jefeproyecto').val(pro.idJefeProyecto);
     }
-    
-    function edicionProyecto(id){
+
+    function edicionProyecto(id) {
         $('#idProyecto').val(id);
         var dat = {
             tipo: 'getProyectoId',
@@ -210,9 +213,9 @@
             data: {
                 datos: datos
             },
-            success: function(resp){
+            success: function (resp) {
                 var obj = JSON.parse(resp);
-                if(obj.estado === 'ok'){
+                if (obj.estado === 'ok') {
                     var pro = new Proyecto();
                     pro.set(obj.proyecto);
                     pro.setIdProyecto($('#idProyecto').val());
@@ -221,14 +224,14 @@
                     $('#btnAccion').removeClass('btn-default');
                     $('#btnAccion').removeClass('btn-warning');
                     $('#btnAccion').addClass('btn-warning');
-                }else{
+                } else {
                     console.log("No se puede cargar la edición del proyecto");
                 }
             }
         });
     }
-    
-    function eliminarProyecto(id){
+
+    function eliminarProyecto(id) {
         var dat = {
             tipo: "eliminarProyecto",
             idProyecto: id
@@ -240,21 +243,117 @@
             data: {
                 datos: datos
             },
-            success: function(resp){
+            success: function (resp) {
                 var obj = JSON.parse(resp);
-                if(obj.estado === 'ok'){
+                if (obj.estado === 'ok') {
                     cargarProyectos();
                     limpiar();
-                }else{
+                } else {
                     console.log("No se pudo eliminar el proyecto");
                 }
             }
         });
     }
     
+    //Edición de etapas proyecto-----------------------------------------------------------------
+
+    function etapasProyecto(boton){
+        var fila = $(boton).parent().parent().parent();
+        var texto = $(fila.children()[2]).text();
+        var id = $(fila.children()[1]).text();
+        var objeto = buscarEtapas(id);
+        $('#titulo-modal').html(texto);
+        var tabla = document.createElement("table");
+        $(tabla).html(objeto.tabla);
+        
+        (objeto.registros === 0 ? $('#cuerpo-modal').html(tabla) : $('#cuerpo-modal').html("<h2>No hay etapas registradas en el proyecto</h2>"));
+        $('#cuerpo-modal').html(objeto.combo + "<br />" +objeto.tabla);
+        $('#modal-edicion').addClass('modal-lg');
+        
+        $('#modal-edicion').modal();
+    }
+    
+    function buscarEtapas(idProyecto){
+        var SALIDA;
+        var dat = {
+            tipo: 'traerEtapas',
+            idProyecto: idProyecto
+        };
+        var datos = JSON.stringify(dat);
+        $.ajax({
+            url: 'Proyectos',
+            type: 'post',
+            async: false,
+            data: {
+                datos: datos
+            },
+            success: function(resp){
+                var obj = JSON.parse(resp);
+                if(obj.estado === 'ok'){
+                   SALIDA = obj; 
+                }else{
+                    console.log("No se puede traer las etapas del proyecto.");
+                    console.log(obj.error);
+                }
+            }
+        });
+        return SALIDA;
+    }
+    
+    function eliminarEtapaProyecto(idEtapaProyecto){
+        
+    }
+
 </script>
 
+<!-- Modal para edicion de proyecto -->
+
+<div id="modal-edicion" class="modal modal-lg fade center-block" role="dialog">
+    <div class="modal-dialog">
+
+        <!-- Contenido-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title" id="titulo-modal"></h4>
+            </div>
+            <div class="modal-body" id="cuerpo-modal">
+
+            </div>
+            <div class="modal-footer">
+
+                <table class="tabla-form" style="width: 100%;">
+                    <tr>
+                        <td>
+                            <button type="button" class="btn btn-success pull-left" >Guardar</button>
+                        </td>
+                        <td>
+                            <button type="button" class="btn btn-default pull-right" data-dismiss="modal">Cerrar</button>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- /Modal -->
+
+
 <div class="container-fluid">
+    <div class="row">
+        <div class="col-sm-6">
+            <div class="form-group-sm">
+                <select id="bla" class="form-control"></select>
+            </div>
+        </div>
+        <div class="col-sm-6">
+            <div class="form-group-sm">
+                <button type="button" class="btn btn-success btn-sm">Agregar</button>
+            </div>
+        </div>
+    </div>
     <input id="idProyecto" type="hidden" value="" />
     <div class="row">
         <div class="col-md-12">
@@ -263,126 +362,98 @@
                     Proyectos
                 </h1>
             </div>
-
             <div class="row">
-                <div class="col-sm-12">
-                    <div class="panel with-nav-tabs panel-default">
-                        <div class="panel-heading">
-                            <ul class="nav nav-tabs">
-                                <li class="active"><a href="#enCurso" data-toggle="tab">En curso</a></li>
-                                <li><a href="#edicion" data-toggle="tab">Edición</a></li>
-                            </ul>
-                        </div>
-
-                        <div class="panel-body">
-                            <div class="tab-content">
-
-                                <div class="tab-pane fade in active" id="enCurso">
-                                    <div class="row">
-                                        <div class="col-sm-3">
-                                            <table class="tabla-form">
-                                                <tr>
-                                                    <td class="td-label">
-                                                        <label for="nombre">Nombre</label>
-                                                    </td>
-                                                    <td>
-                                                        <div class="form-group-sm">
-                                                            <input id="nombre" type="text" class="form-control small" />
-                                                        </div>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td class="td-label">
-                                                        <label for="cliente">Cliente</label>
-                                                    </td>
-                                                    <td>
-                                                        <div class="form-group-sm">
-                                                            <select class="form-control small" id="cliente"></select>
-                                                        </div>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td class="td-label">
-                                                        <label for="fechaini">Fecha inicio</label>
-                                                    </td>
-                                                    <td>
-                                                        <div class="form-group-sm">
-                                                            <input id="fechaini" type="date" class="form-control small" />
-                                                        </div>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td class="td-label">
-                                                        <label for="jefeproyecto">Jefe de Proyecto</label>
-                                                    </td>
-                                                    <td>
-                                                        <div class="form-group-sm">
-                                                            <select class="form-control small" id="jefeproyecto"></select>
-                                                        </div>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td>
-                                                        <div class="form-group-sm">
-                                                            <button id="btnAccion" onclick="accion();" type="button" class="btn btn-default">Ingresar</button>
-                                                        </div>
-                                                    </td>
-                                                    <td>
-                                                        <div class="form-group-sm">
-                                                            <button id="btnLimpiar" onclick="limpiar();" type="button" class="btn btn-default">Limpiar</button>
-                                                        </div>
-                                                    </td>
-                                                </tr>
-                                            </table>
-                                        </div>
-                                        <div class="col-sm-9">
-                                            <table class="table table-hover table-condensed table-striped small">
-                                                <thead>
-                                                    <tr>
-                                                        <th>
-                                                            #
-                                                        </th>
-                                                        <th>
-                                                            ID
-                                                        </th>
-                                                        <th>
-                                                            NOMBRE
-                                                        </th>
-                                                        <th>
-                                                            CLIENTE
-                                                        </th>
-                                                        <th>
-                                                            FECHA INICIO
-                                                        </th>
-                                                        <th>
-                                                            JEFE DE PROYECTO
-                                                        </th>
-                                                        <th>
-                                                            ACCIONES
-                                                        </th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody id="cuerpo-proyectos">
-
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    </div>
-
+                <div class="col-sm-3">
+                    <table class="tabla-form">
+                        <tr>
+                            <td class="td-label">
+                                <label for="nombre">Nombre</label>
+                            </td>
+                            <td>
+                                <div class="form-group-sm">
+                                    <input id="nombre" type="text" class="form-control small" />
                                 </div>
-
-                                <!-- Contenido de la edición de proyectos -->
-                                <div class="tab-pane fade" id="edicion">
-                                    <form id="form-proyecto">
-
-                                    </form>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="td-label">
+                                <label for="cliente">Cliente</label>
+                            </td>
+                            <td>
+                                <div class="form-group-sm">
+                                    <select class="form-control small" id="cliente"></select>
                                 </div>
-                            </div>
-                        </div>
-                    </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="td-label">
+                                <label for="fechaini">Fecha inicio</label>
+                            </td>
+                            <td>
+                                <div class="form-group-sm">
+                                    <input id="fechaini" type="date" class="form-control small" />
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="td-label">
+                                <label for="jefeproyecto">Jefe de Proyecto</label>
+                            </td>
+                            <td>
+                                <div class="form-group-sm">
+                                    <select class="form-control small" id="jefeproyecto"></select>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="form-group-sm">
+                                    <button id="btnAccion" onclick="accion();" type="button" class="btn btn-default">Ingresar</button>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="form-group-sm">
+                                    <button id="btnLimpiar" onclick="limpiar();" type="button" class="btn btn-default">Limpiar</button>
+                                </div>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="col-sm-9">
+                    <table class="table table-hover table-condensed table-striped small">
+                        <thead>
+                            <tr>
+                                <th>
+                                    #
+                                </th>
+                                <th>
+                                    ID
+                                </th>
+                                <th>
+                                    NOMBRE
+                                </th>
+                                <th>
+                                    CLIENTE
+                                </th>
+                                <th>
+                                    FECHA INICIO
+                                </th>
+                                <th>
+                                    JEFE DE PROYECTO
+                                </th>
+                                <th>
+                                    ACCIONES
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody id="cuerpo-proyectos">
+
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
 
