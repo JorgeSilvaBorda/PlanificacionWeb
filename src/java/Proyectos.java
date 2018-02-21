@@ -39,7 +39,14 @@ public class Proyectos extends HttpServlet {
 		out.print(eliminarProyecto(entrada.getString("idProyecto")));
 		break;
 	    case "traerEtapas":
-		out.print(traerEtapas(entrada.getString("idProyecto")));
+		out.print(traerEtapas(Integer.toString(entrada.getInt("idProyecto"))));
+		break;
+	    case "eliminarEtapaProyecto":
+		out.print(eliminarEtapaProyecto(entrada.getString("idEtapaProyecto")));
+		break;
+	    case "agregarEtapaProyecto":
+		out.print(agregarEtapaProyecto(entrada.getJSONObject("etapa")));
+		break;
 	}
     }
 
@@ -152,7 +159,6 @@ public class Proyectos extends HttpServlet {
     }
 
     public JSONObject traerEtapas(String idProyecto) {
-
 	String query = "SELECT\n"
 		+ "	A.ID AS IDPROYECTO,\n"
 		+ "	A.NOMBRE,\n"
@@ -169,12 +175,12 @@ public class Proyectos extends HttpServlet {
 		+ "WHERE\n"
 		+ "	B.IDPROYECTO = " + idProyecto + "\n"
 		+ "ORDER BY\n"
-		+ "	B.NUMETAPA ASC";
+		+ "	B.FECHAINI ASC";
 	ResultSet rs = new Conexion().ejecutarQuery(query);
 	String tabla = "<table class=\"table table-hover table-condensed table-striped small\">";
 	tabla += "<thead>";
 	tabla += "<tr>\n"
-		+ "<th>ORDEN</th>"
+		+ "<th>#</th>"
 		+ "<th>ETAPA</th>\n"
 		+ "<th>FECHA INICIO</th>\n"
 		+ "<th>FECHA FIN</th>\n"
@@ -190,8 +196,11 @@ public class Proyectos extends HttpServlet {
 		fechaFin = rs.getString("FECHAFIN");
 		fechaIni = fechaIni.substring(0, 10);
 		fechaFin = fechaFin.substring(0, 10);
+		
+		fechaIni = fechaIni.split("-")[2] + "-" + fechaIni.split("-")[1] + "-" + fechaIni.split("-")[0];
+		fechaFin = fechaFin.split("-")[2] + "-" + fechaFin.split("-")[1] + "-" + fechaFin.split("-")[0];
 		tabla += "<tr>";
-		tabla += "<td><input type='hidden' value='" + rs.getString("IDETAPAPROYECTO") + "' />" + rs.getString("NUMETAPA") + "</td>";
+		tabla += "<td><input type='hidden' value='" + rs.getString("IDETAPAPROYECTO") + "' />" + Integer.toString(cont + 1) + "</td>";
 		tabla += "<td>" + rs.getString("NOMBREETAPA") + "</td>";
 		tabla += "<td>" + fechaIni + "</td>";
 		tabla += "<td>" + fechaFin + "</td>";
@@ -201,7 +210,7 @@ public class Proyectos extends HttpServlet {
 		 */
 		tabla += "<td style='width: 100px;' class='text-center'>"
 			+ "<div class=\"btn-group\">\n"
-			+ "  <button onclick='eliminarEtapaProyecto(\"" + rs.getObject("IDETAPAPROYECTO") + "\");' type=\"button\" class=\"btn btn-danger btn-xs\">Eliminar</button>\n"
+			+ "  <button onclick='eliminarEtapaProyecto(\"" + rs.getObject("IDETAPAPROYECTO") + "\", \"" + rs.getObject("IDPROYECTO") + "\");' type=\"button\" class=\"btn btn-danger btn-xs\">Eliminar</button>\n"
 			+ "</div>"
 			+ "</td>";
 		cont++;
@@ -236,19 +245,35 @@ public class Proyectos extends HttpServlet {
 		+ "	)";
 	ResultSet rs = new Conexion().ejecutarQuery(query);
 	String contenido = "<div class='row'>\n"
-		+ "        <div class='col-sm-6'>\n"
+		+ "        <input id='idProyectoEdicion' type='hidden' value='" + idProyecto + "'>\n"
+		+ "        <div class='col-sm-8'>\n"
 		+ "            <div class='form-group-sm'>\n"
 		+ "                <select id='etapas' class='form-control'>##contenido-select##</select>\n"
 		+ "            </div>\n"
 		+ "        </div>\n"
-		+ "        <div class='col-sm-6'>\n"
+		+ "        <div class='col-sm-4'>\n"
 		+ "            <div class='form-group-sm'>\n"
-		+ "                <button type='button' class='btn btn-success btn-xs'>Agregar</button>\n"
+		+ "                <button type='button' class='btn btn-success btn-sm' onclick='agregarEtapaProyecto()'>Agregar</button>\n"
 		+ "            </div>\n"
 		+ "        </div>\n"
-		+ "    </div>";
-	String boton = "<buton type='button' class='btn btn-success btn-xs'>Agregar</button>";
-	
+		+ "    </div>"
+		+ "<div class='row'>\n"
+		+ "    <div class='col-sm-4'>\n"
+		+ "        <div class='form-group-sm'>\n"
+		+ "            <label for='fechaIniEtapa'>Fecha inicio</label>\n"
+		+ "            <input id='fechaIniEtapa' type='date' class='form-control'/>\n"
+		+ "        </div>\n"
+		+ "        \n"
+		+ "    </div>\n"
+		+ "    <div class='col-sm-4'>\n"
+		+ "        <div class='form-group-sm'>\n"
+		+ "            <label for='fechaFinEtapa'>Fecha fin</label>\n"
+		+ "            <input id='fechaFinEtapa' type='date' class='form-control'/>\n"
+		+ "        </div>\n"
+		+ "    </div>\n"
+		+ "    <div class='col-sm-4'></div>\n"
+		+ "</div>";
+
 	String combo = "<option value='0'>Seleccione...</option>";
 	int cont = 0;
 	try {
@@ -259,18 +284,42 @@ public class Proyectos extends HttpServlet {
 	    if (cont == 0) {
 		contenido = contenido.replace("select id='etapas'", "select disabled='disabled' id='etapas'");
 		combo = combo.replace("option value='0'>Seleccione...", "option value='0'>No hay etapas disponibles");
-		contenido = contenido.replace("button type='button' class='btn btn-success btn-xs'", "button type='button' class='btn btn-success btn-xs' disabled='disabled'");
+		contenido = contenido.replace("button type='button' class='btn btn-success btn-sm' ", "button type='button' class='btn btn-success btn-xs' disabled='disabled' ");
+		contenido = contenido.replace("id='fechaFinEtapa' type='date'", "id='fechaFin' disabled='disabled' type='date'");
+		contenido = contenido.replace("id='fechaIniEtapa' type='date'", "id='fechaIni' disabled='disabled' type='date'");
 	    }
 	    contenido = contenido.replace("##contenido-select##", combo);
 	    return contenido;
-	} catch (Exception ex) {
+	} catch (SQLException ex) {
 	    System.out.println("No se puede obtener el listado de etapas");
 	    System.out.println(ex);
 	}
 	return "";
     }
+
+    public JSONObject eliminarEtapaProyecto(String idEtapaProyecto) {
+	String query1 = "DELETE FROM ETAPAPROYECTOPERSONAL WHERE ID = " + idEtapaProyecto;
+	String query2 = "DELETE FROM ETAPAPROYECTO WHERE ID = " + idEtapaProyecto;
+	new Conexion().ejecutarUpdate(query1);
+	new Conexion().ejecutarUpdate(query2);
+	JSONObject salida = new JSONObject();
+	salida.put("estado", "ok");
+	return salida;
+    }
     
-    public JSONObject eliminarEtapaProyecto(String idEtapaProyecto){
-	return new JSONObject();
+    public JSONObject agregarEtapaProyecto(JSONObject etapa){
+	java.sql.Date dtIni = java.sql.Date.valueOf(etapa.getString("fechaIni"));
+	java.sql.Date dtFin = java.sql.Date.valueOf(etapa.getString("fechaFin"));
+	String query = "INSERT INTO ETAPAPROYECTO(FECHAINI, FECHAFIN, IDPROYECTO, IDETAPA, NUMETAPA)VALUES("
+		+ "#" + dtIni + "#,"
+		+ "#" + dtFin + "#,"
+		+ etapa.getInt("idProyecto") + ","
+		+ etapa.getInt("idEtapa") + ","
+		+ "(SELECT MAX(NUMETAPA) FROM ETAPAPROYECTO WHERE IDPROYECTO = " + etapa.getInt("idProyecto") + "))";
+	
+	new Conexion().ejecutarUpdate(query);
+	JSONObject salida = new JSONObject();
+	salida.put("estado", "ok");
+	return salida;
     }
 }

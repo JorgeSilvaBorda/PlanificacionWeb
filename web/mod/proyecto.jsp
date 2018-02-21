@@ -254,10 +254,10 @@
             }
         });
     }
-    
+
     //Edición de etapas proyecto-----------------------------------------------------------------
 
-    function etapasProyecto(boton){
+    function etapasProyecto(boton) {
         var fila = $(boton).parent().parent().parent();
         var texto = $(fila.children()[2]).text();
         var id = $(fila.children()[1]).text();
@@ -265,15 +265,14 @@
         $('#titulo-modal').html(texto);
         var tabla = document.createElement("table");
         $(tabla).html(objeto.tabla);
-        
+
         (objeto.registros === 0 ? $('#cuerpo-modal').html(tabla) : $('#cuerpo-modal').html("<h2>No hay etapas registradas en el proyecto</h2>"));
-        $('#cuerpo-modal').html(objeto.combo + "<br />" +objeto.tabla);
-        $('#modal-edicion').addClass('modal-lg');
-        
+        $('#cuerpo-modal').html(objeto.combo + "<br />" + objeto.tabla);
+
         $('#modal-edicion').modal();
     }
-    
-    function buscarEtapas(idProyecto){
+
+    function buscarEtapas(idProyecto) {
         var SALIDA;
         var dat = {
             tipo: 'traerEtapas',
@@ -287,11 +286,11 @@
             data: {
                 datos: datos
             },
-            success: function(resp){
+            success: function (resp) {
                 var obj = JSON.parse(resp);
-                if(obj.estado === 'ok'){
-                   SALIDA = obj; 
-                }else{
+                if (obj.estado === 'ok') {
+                    SALIDA = obj;
+                } else {
                     console.log("No se puede traer las etapas del proyecto.");
                     console.log(obj.error);
                 }
@@ -299,13 +298,82 @@
         });
         return SALIDA;
     }
-    
-    function eliminarEtapaProyecto(idEtapaProyecto){
-        
+
+    function eliminarEtapaProyecto(idEtapaProyecto, idProyecto) {
+        var dat = {
+            tipo: 'eliminarEtapaProyecto',
+            idEtapaProyecto: idEtapaProyecto
+        };
+        var datos = JSON.stringify(dat);
+        $.ajax({
+            url: 'Proyectos',
+            type: 'post',
+            data: {
+                datos: datos
+            },
+            success: function (resp) {
+                var obj = JSON.parse(resp);
+                if (obj.estado === 'ok') {
+                    var objeto = buscarEtapas(idProyecto);
+                    var tabla = document.createElement("table");
+                    $(tabla).html(objeto.tabla);
+
+                    (objeto.registros === 0 ? $('#cuerpo-modal').html(tabla) : $('#cuerpo-modal').html("<h2>No hay etapas registradas en el proyecto</h2>"));
+                    $('#cuerpo-modal').html(objeto.combo + "<br />" + objeto.tabla);
+                } else {
+                    console.log(obj.error);
+                }
+            },
+            error: function (a, b, c) {
+                console.log(a);
+                console.log(b);
+                console.log(c);
+            }
+        });
     }
 
-</script>
+    var ETAPA;
+    function agregarEtapaProyecto() {
+        var etapa = {
+            idProyecto: parseInt($('#idProyectoEdicion').val()),
+            idEtapa: parseInt($('#etapas').val()),
+            fechaIni: $('#fechaIniEtapa').val(),
+            fechaFin: $('#fechaFinEtapa').val()
+        };
+        ETAPA = etapa;
+        var dat = {
+            tipo: 'agregarEtapaProyecto',
+            etapa: etapa
+        };
 
+        var datos = JSON.stringify(dat);
+        $.ajax({
+            url: 'Proyectos',
+            type: 'post',
+            data: {
+                datos: datos
+            },
+            success: function (resp) {
+                var obj = JSON.parse(resp);
+                if (obj.estado === 'ok') {
+                    var objeto = buscarEtapas(etapa.idProyecto);
+                    var tabla = document.createElement("table");
+                    $(tabla).html(objeto.tabla);
+
+                    (objeto.registros === 0 ? $('#cuerpo-modal').html(tabla) : $('#cuerpo-modal').html("<h2>No hay etapas registradas en el proyecto</h2>"));
+                    $('#cuerpo-modal').html(objeto.combo + "<br />" + objeto.tabla);
+                } else {
+                    console.log(obj.error);
+                }
+            },
+            error: function (a, b, c) {
+                console.log(a);
+                console.log(b);
+                console.log(c);
+            }
+        });
+    }
+</script>
 <!-- Modal para edicion de proyecto -->
 
 <div id="modal-edicion" class="modal modal-lg fade center-block" role="dialog">
@@ -324,9 +392,6 @@
 
                 <table class="tabla-form" style="width: 100%;">
                     <tr>
-                        <td>
-                            <button type="button" class="btn btn-success pull-left" >Guardar</button>
-                        </td>
                         <td>
                             <button type="button" class="btn btn-default pull-right" data-dismiss="modal">Cerrar</button>
                         </td>
