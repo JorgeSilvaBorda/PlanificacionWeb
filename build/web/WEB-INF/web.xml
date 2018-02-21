@@ -24,6 +24,14 @@
         <servlet-name>Clientes</servlet-name>
         <servlet-class>Clientes</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>ProyectoRecurso</servlet-name>
+        <servlet-class>ProyectoRecurso</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>VisionGeneral</servlet-name>
+        <servlet-class>VisionGeneral</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>Proyectos</servlet-name>
         <url-pattern>/Proyectos</url-pattern>
@@ -47,6 +55,14 @@
     <servlet-mapping>
         <servlet-name>Clientes</servlet-name>
         <url-pattern>/Clientes</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ProyectoRecurso</servlet-name>
+        <url-pattern>/ProyectoRecurso</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>VisionGeneral</servlet-name>
+        <url-pattern>/VisionGeneral</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>

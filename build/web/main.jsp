@@ -17,6 +17,7 @@
             e.stopPropagation();
             e.preventDefault();
         });
+        cargarModulo("general");
     });
     
     function cargarModulo(nombre){
@@ -40,7 +41,7 @@
                                 <li onclick="cargarModulo('proyecto');" >
                                     <a href="#">Proyectos</a>
                                 </li>
-                                <li>
+                                <li onclick="cargarModulo('proyectoRecurso');">
                                     <a href="#">Asignaciones</a>
                                 </li>
                                 <li class="divider"></li>

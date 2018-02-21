@@ -22,3 +22,11 @@
 <script src="js/jquery.jqGrid.min.js" type="text/javascript"></script>
 
 <!-- /JQGrid -->
+
+<!-- Bootstrap table -->
+
+<link href="css/bootstrap-table.css" rel="stylesheet" type="text/css"/>
+
+<script src="js/bootstrap-table.js" type="text/javascript"></script>
+
+<!-- /Bootstrap table -->
