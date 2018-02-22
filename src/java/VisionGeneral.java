@@ -58,6 +58,8 @@ public class VisionGeneral extends HttpServlet {
 		+ "WHERE\n"
 		+ "	A.ACTIVO = 1\n"
 		+ "ORDER BY\n"
+		+ "	A.NOMBRE ASC,"
+		+ "	E.ID ASC,\n"
 		+ "	D.FECHAINI ASC";
 	ResultSet rs = new Conexion().ejecutarQuery(query);
 	JSONObject proyecto;
@@ -72,6 +74,7 @@ public class VisionGeneral extends HttpServlet {
 	    proyectos = new JSONArray();
 	    while (rs.next()) {
 		if (!indProyActual.equals(rs.getString("COLID"))) {
+		    //Si es distinto, se crea un nuevo proyecto
 		    indProyActual = rs.getString("COLID");
 		    proyecto = new JSONObject();
 		    proyecto.put("COLID", rs.getString("COLID"));
@@ -99,6 +102,7 @@ public class VisionGeneral extends HttpServlet {
 		} else {
 		    //Si es igual, no se vuelven a meter los datos del proyecto. Se toma el proyecto ultimo en la lista para agregar etapas
 		    proyecto = proyectos.getJSONObject(proyectos.length() - 1); //se le agregan etapas
+		    indProyActual = rs.getString("COLID");
 		    if (!proyecto.getJSONArray("etapas").getJSONObject(proyecto.getJSONArray("etapas").length() - 1).getString("COLETAPA").equals(rs.getString("COLETAPA"))) {
 			nomEtapaActual = rs.getString("COLETAPA");
 			etapa = new JSONObject();
@@ -111,7 +115,8 @@ public class VisionGeneral extends HttpServlet {
 			recurso.put("COLPORCENTAJE", rs.getString("COLPORCENTAJE"));
 			recurso.put("COLROL", rs.getString("COLROL"));
 			etapa.append("recursos", recurso);
-			proyecto.append("etapas", etapa);
+			//proyecto.append("etapas", etapa);
+			proyectos.getJSONObject(proyectos.length() - 1).append("etapas", etapa);
 		    }else{
 			//Si la etapa es la misma, se le meten mas recursos
 			etapa = proyecto.getJSONArray("etapas").getJSONObject(proyecto.getJSONArray("etapas").length() - 1);
@@ -121,14 +126,14 @@ public class VisionGeneral extends HttpServlet {
 			recurso.put("COLPORCENTAJE", rs.getString("COLPORCENTAJE"));
 			recurso.put("COLROL", rs.getString("COLROL"));
 			etapa.append("recursos", recurso);
-			
 		    }
-
 		}
-
+		//proyectos.put(proyecto);
 	    }
 	    //System.out.println(proyectos.toString().replace("[{", "[{" + SEP).replace("\",", "\"," + SEP));
 	    JSONObject salida = new JSONObject();
+
+	    System.out.println(proyectos);
 	    salida.put("estado", "ok");
 	    salida.put("data", proyectos);
 	    return salida;

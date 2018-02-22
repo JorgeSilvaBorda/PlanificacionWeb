@@ -7,3 +7,20 @@ c:\tomcat7\base.mdb
 El archivo MDB se incluye en el repositorio de fuentes para ser ubicado.
 Luego se revisará la manera de mantenerlo en la aplicación.
 Evaluar la posibilidad de incluirla en el classpath de la aplicacion
+
+Por problemas en el formateo del Objeto JSON, al parecer se debe hacer 
+que se busque los datos con varias query sobre el mismo objeto y agregarle arrays
+
+BUGFIX 1:
+**	Problema:
+	Al cargar la pantalla de Visión general, se repetían los proyectos, cuando debían
+	ser agrupados.
+	
+** 	Solución:
+	Se corrige la query que cargaba toda la información para que se obtengan los resultados 
+	ordenados por:
+		1.- NOMBRE PROYECTO.
+		2.- ID ETAPA PROYECTO.
+		3.- FECHA INI ETAPA PROYECTO.
+** 	Resolición:
+	OK.
