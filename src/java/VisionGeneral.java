@@ -14,14 +14,19 @@ import org.json.JSONObject;
  * @author Jorge Silva Borda
  */
 public class VisionGeneral extends HttpServlet {
+
     public final String SEP = System.getProperty("line.separator");
+
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	request.setCharacterEncoding("UTF-8");
+	response.setContentType("text/html;charset=UTF-8");
+
 	PrintWriter out = response.getWriter();
 	JSONObject entrada = new JSONObject(request.getParameter("datos"));
 	switch (entrada.getString("tipo")) {
 	    case "traerTodos":
-		traerTodo();
+		out.print(traerTodo());
 		break;
 	}
     }
@@ -59,13 +64,15 @@ public class VisionGeneral extends HttpServlet {
 	JSONObject recurso;
 	JSONObject etapa;
 	JSONArray proyectos = new JSONArray();
+	JSONArray etapas = new JSONArray();
 	String indProyActual = "";
 	String nomEtapaActual = "";
 	String nomRecursoActual = "";
 	try {
 	    proyectos = new JSONArray();
 	    while (rs.next()) {
-		if(!indProyActual.equals(rs.getString("COLID"))){
+		if (!indProyActual.equals(rs.getString("COLID"))) {
+		    indProyActual = rs.getString("COLID");
 		    proyecto = new JSONObject();
 		    proyecto.put("COLID", rs.getString("COLID"));
 		    proyecto.put("COLNOMBRE", rs.getString("COLNOMBRE"));
@@ -73,13 +80,58 @@ public class VisionGeneral extends HttpServlet {
 		    proyecto.put("COLJP", rs.getString("COLJP"));
 		    proyecto.put("COLINIPROYECTO", rs.getString("COLINIPROYECTO"));
 		    proyecto.put("COLFINPROYECTO", rs.getString("COLFINPROYECTO"));
+		    //if (!proyecto.getJSONArray("etapas").getJSONObject(proyecto.getJSONArray("etapas").length() - 1).getString("COLETAPA").equals(rs.getString("COLETAPA"))) {
+		    nomEtapaActual = rs.getString("COLETAPA");
+		    etapa = new JSONObject();
+		    etapa.put("COLETAPA", rs.getString("COLETAPA"));
+		    etapa.put("COLFECHAINI", rs.getString("COLFECHAINI"));
+		    etapa.put("COLFECHAFIN", rs.getString("COLFECHAFIN"));
+
+		    nomRecursoActual = rs.getString("COLRECURSO");
+		    recurso = new JSONObject();
+		    recurso.put("COLRECURSO", rs.getString("COLRECURSO"));
+		    recurso.put("COLPORCENTAJE", rs.getString("COLPORCENTAJE"));
+		    recurso.put("COLROL", rs.getString("COLROL"));
+		    etapa.append("recursos", recurso);
+		    proyecto.append("etapas", etapa);
+		    //}
 		    proyectos.put(proyecto);
-		}else{
+		} else {
 		    //Si es igual, no se vuelven a meter los datos del proyecto. Se toma el proyecto ultimo en la lista para agregar etapas
-		    proyecto = proyectos.getJSONObject(proyectos.length() - 1);
+		    proyecto = proyectos.getJSONObject(proyectos.length() - 1); //se le agregan etapas
+		    if (!proyecto.getJSONArray("etapas").getJSONObject(proyecto.getJSONArray("etapas").length() - 1).getString("COLETAPA").equals(rs.getString("COLETAPA"))) {
+			nomEtapaActual = rs.getString("COLETAPA");
+			etapa = new JSONObject();
+			etapa.put("COLETAPA", rs.getString("COLETAPA"));
+			etapa.put("COLFECHAINI", rs.getString("COLFECHAINI"));
+			etapa.put("COLFECHAFIN", rs.getString("COLFECHAFIN"));
+			nomRecursoActual = rs.getString("COLRECURSO");
+			recurso = new JSONObject();
+			recurso.put("COLRECURSO", rs.getString("COLRECURSO"));
+			recurso.put("COLPORCENTAJE", rs.getString("COLPORCENTAJE"));
+			recurso.put("COLROL", rs.getString("COLROL"));
+			etapa.append("recursos", recurso);
+			proyecto.append("etapas", etapa);
+		    }else{
+			//Si la etapa es la misma, se le meten mas recursos
+			etapa = proyecto.getJSONArray("etapas").getJSONObject(proyecto.getJSONArray("etapas").length() - 1);
+			nomRecursoActual = rs.getString("COLRECURSO");
+			recurso = new JSONObject();
+			recurso.put("COLRECURSO", rs.getString("COLRECURSO"));
+			recurso.put("COLPORCENTAJE", rs.getString("COLPORCENTAJE"));
+			recurso.put("COLROL", rs.getString("COLROL"));
+			etapa.append("recursos", recurso);
+			
+		    }
+
 		}
+
 	    }
 	    System.out.println(proyectos.toString().replace("[{", "[{" + SEP).replace("\",", "\"," + SEP));
+	    JSONObject salida = new JSONObject();
+	    salida.put("estado", "ok");
+	    salida.put("data", proyectos);
+	    return salida;
 	} catch (SQLException ex) {
 	    System.out.println("No se pudo obtener la informacion general de los proyectos");
 	    System.out.println(ex);

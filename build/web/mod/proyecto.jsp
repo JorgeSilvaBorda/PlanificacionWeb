@@ -13,7 +13,7 @@
                 nombre: this.nombre,
                 idCliente: this.idCliente,
                 fechaIni: this.fechaIni,
-                idJefeProyecto: this.idJefeProyecto,
+                idJefeProyecto: this.idJefeProyecto
             };
         };
         this.set = function (pro) {
@@ -31,6 +31,9 @@
         cargarProyectos();//-->llama a cargarProyectosEdicion();
         cargarCombo("cliente");
         cargarCombo("jefeproyecto");
+        $("#modal-edicion").on("hidden.bs.modal", function () {
+            $("#modal-edicion").removeClass('center-block');
+        });
         //$("#modal-edicion").modal()
     });
 
@@ -80,7 +83,7 @@
                     cargarProyectos();
                     limpiar();
                 } else {
-                    console.log("No se puede ingresar el proyecto")
+                    console.log("No se puede ingresar el proyecto");
                 }
             }
         });
@@ -268,7 +271,7 @@
 
         (objeto.registros === 0 ? $('#cuerpo-modal').html(tabla) : $('#cuerpo-modal').html("<h2>No hay etapas registradas en el proyecto</h2>"));
         $('#cuerpo-modal').html(objeto.combo + "<br />" + objeto.tabla);
-
+        $("#modal-edicion").addClass('center-block');
         $('#modal-edicion').modal();
     }
 
@@ -376,32 +379,7 @@
 </script>
 <!-- Modal para edicion de proyecto -->
 
-<div id="modal-edicion" class="modal modal-lg fade center-block" role="dialog">
-    <div class="modal-dialog">
 
-        <!-- Contenido-->
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal">&times;</button>
-                <h4 class="modal-title" id="titulo-modal"></h4>
-            </div>
-            <div class="modal-body" id="cuerpo-modal">
-
-            </div>
-            <div class="modal-footer">
-
-                <table class="tabla-form" style="width: 100%;">
-                    <tr>
-                        <td>
-                            <button type="button" class="btn btn-default pull-right" data-dismiss="modal">Cerrar</button>
-                        </td>
-                    </tr>
-                </table>
-            </div>
-        </div>
-
-    </div>
-</div>
 
 <!-- /Modal -->
 

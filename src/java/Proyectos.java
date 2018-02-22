@@ -53,11 +53,11 @@ public class Proyectos extends HttpServlet {
     public JSONObject ingresarProyecto(JSONObject json) {
 	JSONObject proyecto = json.getJSONObject("proyecto");
 	java.sql.Date dt = java.sql.Date.valueOf(proyecto.getString("fechaIni"));
-	String query = "INSERT INTO PROYECTO(NOMBRE, FECHAINI, IDCLIENTE, IDJP)VALUES("
+	String query = "INSERT INTO PROYECTO(NOMBRE, FECHAINI, IDCLIENTE, IDJP, ACTIVO)VALUES("
 		+ "'" + proyecto.getString("nombre") + "',"
 		+ "#" + dt + "#,"
 		+ proyecto.getString("idCliente") + ","
-		+ proyecto.getString("idJefeProyecto") + ")";
+		+ proyecto.getString("idJefeProyecto") + ", 1)";
 	new Conexion().ejecutarUpdate(query);
 	return new JSONObject().put("estado", "ok");
     }

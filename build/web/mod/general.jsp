@@ -1,11 +1,10 @@
 <script type="text/javascript">
+    var DATOS;
     $(document).ready(function () {
-        //Cargar grid en JSON
-        //cargarGrid();
         traerTodos();
     });
-
     function traerTodos() {
+        var data;
         var dat = {
             tipo: 'traerTodos'
         };
@@ -13,13 +12,14 @@
         $.ajax({
             url: 'VisionGeneral',
             type: 'post',
+            async: false,
             data: {
                 datos: datos
             },
             success: function (resp) {
                 var obj = JSON.parse(resp);
                 if (obj.estado === 'ok') {
-
+                    armar(obj.data);
                 } else {
                     console.log(obj.error);
                 }
@@ -30,187 +30,80 @@
                 console.log(c);
             }
         });
+        return data;
     }
 
-    var data = [{
-            'COLID': '1',
-            'COLNOMBRE': 'Ejemplo',
-            'COLCLIENTE': 'CLIENTE',
-            'COLJP': 'Jorge Silva Borda',
-            'COLFECHAINI': '20-12-2018',
-            'COLFECHAFIN': '20-12-2018',
-            'etapas': [{
-                    'COLETAPA': 'ANALISIS',
-                    'COLFECHAINI': '20-12-2018',
-                    'COLFECHAFIN': '23-12-2018',
-                    'recursos': [{
-                            'COLRECURSO': 'Hugo Mercado',
-                            'COLPORCENTAJE': '50%',
-                            'COLROL': '<button type=\"button\">Editar</button>'
-                        },
-                        {
-                            'COLRECURSO': 'Jorge Silva',
-                            'COLPORCENTAJE': '30%',
-                            'COLROL': '<button type=\"button\">Editar</button>'
-                        },
-                        {
-                            'COLRECURSO': 'Lorena González',
-                            'COLPORCENTAJE': '20%',
-                            'COLROL': '<button type=\"button\">Editar</button>'
-                        }]
-                },
-                {
-                    'COLETAPA': 'DISEÑO',
-                    'COLFECHAINI': '20-12-2018',
-                    'COLFECHAFIN': '23-12-2018',
-                    'recuros': [{
-                            'COLRECURSO': 'Hugo Mercado',
-                            'COLPORCENTAJE': '50%',
-                            'COLROL': '<button type=\"button\">Editar</button>'
-                        },
-                        {
-                            'COLRECURSO': 'Jorge Silva',
-                            'COLPORCENTAJE': '30%',
-                            'COLROL': '<button type=\"button\">Editar</button>'
-                        },
-                        {
-                            'COLRECURSO': 'Lorena González',
-                            'COLPORCENTAJE': '20%',
-                            'COLROL': '<button type=\"button\">Editar</button>'
-                        }]
-                },
-                {
-                    'COLETAPA': 'DESARROLLO',
-                    'COLFECHAINI': '20-12-2018',
-                    'COLFECHAFIN': '23-12-2018',
-                    'recursos': [{
-                            'COLRECURSO': 'Hugo Mercado',
-                            'COLPORCENTAJE': '50%',
-                            'COLROL': '<button type=\"button\">Editar</button>'
-                        },
-                        {
-                            'COLRECURSO': 'Jorge Silva',
-                            'COLPORCENTAJE': '30%',
-                            'COLROL': '<button type=\"button\">Editar</button>'
-                        },
-                        {
-                            'COLRECURSO': 'Lorena González',
-                            'COLPORCENTAJE': '20%',
-                            'COLROL': '<button type=\"button\">Editar</button>'
-                        }]
-                },
-                {
-                    'COLETAPA': 'PRUEBAS',
-                    'COLFECHAINI': '20-12-2018',
-                    'COLFECHAFIN': '23-12-2018',
-                    'recuros': [{
-                            'COLRECURSO': 'Hugo Mercado',
-                            'COLPORCENTAJE': '50%',
-                            'COLROL': '<button type=\"button\">Editar</button>'
-                        },
-                        {
-                            'COLRECURSO': 'Jorge Silva',
-                            'COLPORCENTAJE': '30%',
-                            'COLROL': '<button type=\"button\">Editar</button>'
-                        },
-                        {
-                            'COLRECURSO': 'Lorena González',
-                            'COLPORCENTAJE': '20%',
-                            'COLROL': '<button type=\"button\">Editar</button>'
-                        }]
-                },
-                {
-                    'COLETAPA': 'PRODUCCION',
-                    'COLFECHAINI': '20-12-2018',
-                    'COLFECHAFIN': '23-12-2018',
-                    'recuros': [{
-                            'COLRECURSO': 'Hugo Mercado',
-                            'COLPORCENTAJE': '50%',
-                            'COLROL': '<button type=\"button\">Editar</button>'
-                        },
-                        {
-                            'COLRECURSO': 'Jorge Silva',
-                            'COLPORCENTAJE': '30%',
-                            'COLROL': '<button type=\"button\">Editar</button>'
-                        },
-                        {
-                            'COLRECURSO': 'Lorena González',
-                            'COLPORCENTAJE': '20%',
-                            'COLROL': '<button type=\"button\">Editar</button>'
-                        }]
-                }]
-        }];
+    function armar(datos) {
+        var $table = $('#tabla-main');
+        $(function () {
 
-
-    var $table = $('#tabla-main');
-    $(function () {
-
-        $table.bootstrapTable({
-            //Modelo tabla padre
-            columns: [{
-                    field: 'COLID',
-                    title: 'ID'
-                }, {
-                    field: 'COLNOMBRE',
-                    title: 'PROYECTO'
-                },
-                {
-                    field: 'COLFECHAINI',
-                    title: 'FECHA INICIO'
-                },
-                {
-                    field: 'COLFECHAFIN',
-                    title: 'FECHA FIN'
-                },
-                {
-                    field: 'COLCLIENTE',
-                    title: 'CLIENTE'
-                },
-                {
-                    field: 'COLJP',
-                    title: 'JEFE PROYECTO'
-                }],
-            data: data,
-            detailView: true,
-            onExpandRow: function (index, row, $detail) {
-                console.log(row);
-                $detail.html('<table></table>').find('table').bootstrapTable({
-                    columns: [{
-                            field: 'COLETAPA',
-                            title: 'ETAPA'
-                        }, {
-                            field: 'COLFECHAINI',
-                            title: 'FECHA INICIO'
-                        }, {
-                            field: 'COLFECHAFIN',
-                            title: 'FECHA FIN'
-                        }],
-                    data: row.etapas,
-                    // Simple contextual, assumes all entries have further nesting
-                    // Just shows example of how you might differentiate some rows, though also remember row class and similar possible flags
-                    detailView: row.nested[0]['other'] !== undefined,
-                    onExpandRow: function (indexb, rowb, $detailb) {
-                        $detailb.html('<table></table>').find('table').bootstrapTable({
-                            columns: [{
-                                    field: 'COLRECURSO',
-                                    title: 'RECURSO'
-                                },
-                                {
-                                    field: 'COLPORCENTAJE',
-                                    title: 'PORCENTAJE'
-                                },
-                                {
-                                    field: 'COLROL',
-                                    title: 'ROL'
-                                }],
-                            data: rowb.recursos
-                        });
-                    }
-                });
-
-            }
+            $table.bootstrapTable({
+                //Modelo tabla padre
+                columns: [{
+                        field: 'COLID',
+                        title: 'ID'
+                    },
+                    {
+                        field: 'COLNOMBRE',
+                        title: 'PROYECTO'
+                    },
+                    {
+                        field: 'COLCLIENTE',
+                        title: 'CLIENTE'
+                    },
+                    {
+                        field: 'COLJP',
+                        title: 'JEFE PROYECTO'
+                    },
+                    {
+                        field: 'COLINIPROYECTO',
+                        title: 'FECHA INICIO'
+                    },
+                    {
+                        field: 'COLFINPROYECTO',
+                        title: 'FECHA FIN'
+                    }],
+                data: datos,
+                detailView: true,
+                onExpandRow: function (index, row, $detail) {
+                    console.log(row);
+                    $detail.html('<table></table>').find('table').bootstrapTable({
+                        columns: [{
+                                field: 'COLETAPA',
+                                title: 'ETAPA'
+                            }, {
+                                field: 'COLFECHAINI',
+                                title: 'FECHA INICIO'
+                            }, {
+                                field: 'COLFECHAFIN',
+                                title: 'FECHA FIN'
+                            }],
+                        data: row.etapas,
+                        //detailView: row.nested[0]['etapas'] !== undefined,
+                        detailView: true,
+                        onExpandRow: function (indexb, rowb, $detailb) {
+                            $detailb.html('<table></table>').find('table').bootstrapTable({
+                                columns: [{
+                                        field: 'COLRECURSO',
+                                        title: 'RECURSO'
+                                    },
+                                    {
+                                        field: 'COLPORCENTAJE',
+                                        title: 'PORCENTAJE'
+                                    },
+                                    {
+                                        field: 'COLROL',
+                                        title: 'ROL'
+                                    }],
+                                data: rowb.recursos
+                            });
+                        }
+                    });
+                }
+            });
         });
-    });
+    }
+
 </script>
 
 <div class="row">

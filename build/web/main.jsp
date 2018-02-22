@@ -19,12 +19,13 @@
         });
         cargarModulo("general");
     });
-    
-    function cargarModulo(nombre){
+
+    function cargarModulo(nombre) {
         $('#contenido').load('mod/' + nombre + ".jsp");
     }
 </script>
 <div class="container-fluid">
+
     <div class="row">
         <div class="col-md-12">
             <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -35,13 +36,16 @@
                 </div>
                 <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                     <ul class="nav navbar-nav">
+                        <li onclick="cargarModulo('general')" class="active">
+                            <a href="#">Visión general</a>
+                        </li>
                         <li class="dropdown">
                             <a href="#" class="dropdown-toggle" data-toggle="dropdown">Menú<strong class="caret"></strong></a>
                             <ul class="dropdown-menu">
                                 <li onclick="cargarModulo('proyecto');" >
                                     <a href="#">Proyectos</a>
                                 </li>
-                                <li onclick="cargarModulo('proyectoRecurso');">
+                                <li onclick="cargarModulo('asignaciones');">
                                     <a href="#">Asignaciones</a>
                                 </li>
                                 <li class="divider"></li>
@@ -57,7 +61,7 @@
                             </ul>
                         </li>
                     </ul>
-                    
+
                 </div>
             </nav>
         </div>
