@@ -127,7 +127,7 @@ public class VisionGeneral extends HttpServlet {
 		}
 
 	    }
-	    System.out.println(proyectos.toString().replace("[{", "[{" + SEP).replace("\",", "\"," + SEP));
+	    //System.out.println(proyectos.toString().replace("[{", "[{" + SEP).replace("\",", "\"," + SEP));
 	    JSONObject salida = new JSONObject();
 	    salida.put("estado", "ok");
 	    salida.put("data", proyectos);
