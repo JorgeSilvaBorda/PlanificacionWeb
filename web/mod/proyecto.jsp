@@ -291,8 +291,10 @@
             },
             success: function (resp) {
                 var obj = JSON.parse(resp);
+
                 if (obj.estado === 'ok') {
                     SALIDA = obj;
+                    $('#hidFechaIniProy').val(obj.fechaIniProy);
                 } else {
                     console.log("No se puede traer las etapas del proyecto.");
                     console.log(obj.error);
@@ -337,44 +339,92 @@
 
     var ETAPA;
     function agregarEtapaProyecto() {
-        var etapa = {
-            idProyecto: parseInt($('#idProyectoEdicion').val()),
-            idEtapa: parseInt($('#etapas').val()),
-            fechaIni: $('#fechaIniEtapa').val(),
-            fechaFin: $('#fechaFinEtapa').val()
-        };
-        ETAPA = etapa;
-        var dat = {
-            tipo: 'agregarEtapaProyecto',
-            etapa: etapa
-        };
+        if (validarEtapa()) {
+            var etapa = {
+                idProyecto: parseInt($('#idProyectoEdicion').val()),
+                idEtapa: parseInt($('#etapas').val()),
+                fechaIni: $('#fechaIniEtapa').val(),
+                fechaFin: $('#fechaFinEtapa').val()
+            };
+            ETAPA = etapa;
+            var dat = {
+                tipo: 'agregarEtapaProyecto',
+                etapa: etapa
+            };
 
-        var datos = JSON.stringify(dat);
-        $.ajax({
-            url: 'Proyectos',
-            type: 'post',
-            data: {
-                datos: datos
-            },
-            success: function (resp) {
-                var obj = JSON.parse(resp);
-                if (obj.estado === 'ok') {
-                    var objeto = buscarEtapas(etapa.idProyecto);
-                    var tabla = document.createElement("table");
-                    $(tabla).html(objeto.tabla);
+            var datos = JSON.stringify(dat);
+            $.ajax({
+                url: 'Proyectos',
+                type: 'post',
+                data: {
+                    datos: datos
+                },
+                success: function (resp) {
+                    var obj = JSON.parse(resp);
+                    if (obj.estado === 'ok') {
+                        var objeto = buscarEtapas(etapa.idProyecto);
+                        var tabla = document.createElement("table");
+                        $(tabla).html(objeto.tabla);
 
-                    (objeto.registros === 0 ? $('#cuerpo-modal').html(tabla) : $('#cuerpo-modal').html("<h2>No hay etapas registradas en el proyecto</h2>"));
-                    $('#cuerpo-modal').html(objeto.combo + "<br />" + objeto.tabla);
-                } else {
-                    console.log(obj.error);
+                        (objeto.registros === 0 ? $('#cuerpo-modal').html(tabla) : $('#cuerpo-modal').html("<h2>No hay etapas registradas en el proyecto</h2>"));
+                        $('#cuerpo-modal').html(objeto.combo + "<br />" + objeto.tabla);
+                    } else {
+                        console.log(obj.error);
+                    }
+                },
+                error: function (a, b, c) {
+                    console.log(a);
+                    console.log(b);
+                    console.log(c);
                 }
-            },
-            error: function (a, b, c) {
-                console.log(a);
-                console.log(b);
-                console.log(c);
-            }
-        });
+            });
+        }
+
+    }
+
+    function validarFechas() {
+        var fechaIniEt = moment($('#fechaIniEtapa').val());
+        var fechaFinEt = moment($('#fechaFinEtapa').val());
+        return parseInt(fechaFinEt.diff(fechaIniEt, 'days'));
+    }
+
+    function validarFechaIni() {
+        var fechaIniProy = moment($('#hidFechaIniProy').val());
+        var fechaIniEtapa = moment($('#fechaIniEtapa').val());
+        return fechaIniEtapa.diff(fechaIniProy, 'days');
+    }
+
+    function validarEtapa() {
+        
+        if($('#fechaIniEtapa').val().length < 1){
+            alert('Debe indicar la fecha de inicio de la etapa');
+            return false;
+        }
+        
+        if($('#fechaFinEtapa').val().length < 1){
+            alert('Debe indicar la fecha de fin de la etapa');
+            return false;
+        }
+        
+        if (validarFechas() <= 0) {
+            console.log("validacion de fechas : " + validarFechas());
+            alert("La fecha de inicio de la etapa no puede ser posterior a la fecha de término de la misma.");
+            return false;
+        }
+
+        if (validarFechaIni() < 0) {
+            console.log("Validacion fecha ini: " + validarFechaIni());
+            alert("La fecha de comienzo de la etapa no puede ser anterior a la fecha de comienzo del proyecto");
+            return false;
+        }
+
+        if ($('#etapas').val() === 0 || $('#etapas').val() === '0') {
+            alert("Debe seleccionar una etapa del listado");
+            return false;
+        }
+        
+        
+        return true;
     }
 </script>
 <!-- Modal para edicion de proyecto -->
@@ -385,6 +435,7 @@
 
 
 <div class="container-fluid">
+    <input type='hidden' id='hidFechaIniProy' value='' />
     <div class="row">
         <div class="col-sm-6">
             <div class="form-group-sm">
