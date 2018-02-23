@@ -32,6 +32,10 @@
         <servlet-name>Asignaciones</servlet-name>
         <servlet-class>Asignaciones</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>Informe</servlet-name>
+        <servlet-class>Informe</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>Proyectos</servlet-name>
         <url-pattern>/Proyectos</url-pattern>
@@ -63,6 +67,10 @@
     <servlet-mapping>
         <servlet-name>Asignaciones</servlet-name>
         <url-pattern>/Asignaciones</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>Informe</servlet-name>
+        <url-pattern>/Informe</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>
