@@ -250,7 +250,14 @@
             alert('Debe indicar el porcentaje de asignación para el recurso');
             return false;
         }
-        
+        if(parseInt(datos.porcentaje) > 100){
+            alert("El porcentaje de asignación no puede ser mayor a 100");
+            return false;
+        }
+        if($('hidIdEtapaProyecto').val() === ''){
+            alert('No ha seleccionado una etapa para asignar recursos');
+            return false;
+        }
         return true;
     }
 

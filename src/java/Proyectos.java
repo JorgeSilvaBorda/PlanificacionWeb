@@ -159,9 +159,11 @@ public class Proyectos extends HttpServlet {
     }
 
     public JSONObject traerEtapas(String idProyecto) {
+	JSONObject salida = new JSONObject();
 	String query = "SELECT\n"
 		+ "	A.ID AS IDPROYECTO,\n"
 		+ "	A.NOMBRE,\n"
+		+ "	FORMAT(A.FECHAINI, 'yyyy-mm-dd') AS FECHAINIPROY,\n"
 		+ "	B.ID AS IDETAPAPROYECTO,\n"
 		+ "	B.FECHAINI,\n"
 		+ "	B.FECHAFIN,\n"
@@ -186,7 +188,7 @@ public class Proyectos extends HttpServlet {
 		+ "<th>FECHA FIN</th>\n"
 		+ "<th>ACCIONES</th>\n"
 		+ "</tr>";
-	JSONObject salida = new JSONObject();
+	
 	salida.put("combo", genComboEtapas(idProyecto));
 	int cont = 0;
 	try {
@@ -214,6 +216,7 @@ public class Proyectos extends HttpServlet {
 			+ "</div>"
 			+ "</td>";
 		cont++;
+		salida.put("fechaIniProy", rs.getString("FECHAINIPROY"));
 	    }
 	    salida.put("registros", cont);
 	    salida.put("tabla", tabla);
