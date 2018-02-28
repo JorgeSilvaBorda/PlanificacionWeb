@@ -31,3 +31,15 @@
 <script src="js/bootstrap-table.js" type="text/javascript"></script>
 
 <!-- /Bootstrap table -->
+
+<!-- Para el módulo informe -->
+<script src="amcharts/amcharts.js" type="text/javascript"></script>
+<script src="amcharts/serial.js" type="text/javascript"></script>
+<script src="amcharts/amstock.js" type="text/javascript"></script>
+<script src="amcharts/export.min.js" type="text/javascript"></script>
+<script src="amcharts/light.js" type="text/javascript"></script>
+
+
+<link href="amcharts/export.css" rel="stylesheet" type="text/css"/>
+
+<!-- /Para el módulo informe -->

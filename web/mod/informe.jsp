@@ -1,35 +1,27 @@
-<script src="../amcharts/amstock.js" type="text/javascript"></script>
-<script src="../amcharts/amcharts.js" type="text/javascript"></script>
-<script src="../amcharts/serial.js" type="text/javascript"></script>
-<script src="../amcharts/export.min.js" type="text/javascript"></script>
-
-<link href="../amcharts/export.css" rel="stylesheet" type="text/css"/>
 
 <script type='text/javascript'>
-    
-    $(document).ready(function(){
-        
+    var SALIDA;
+    $(document).ready(function () {
+        getCargaTodos();
     });
-    
-    function getRangoFechas() {
+    function getCargaTodos() {
         var dat = {
-            tipo: 'getRangoFechas'
+            tipo: 'getCargaTodos'
         };
         var datos = JSON.stringify(dat);
         $.ajax({
-            url: 'Inform',
+            url: 'Informe',
             type: 'post',
             async: false,
             data: {
                 datos: datos
             },
             success: function (resp) {
+                
                 var obj = JSON.parse(resp);
+                SALIDA = obj;
                 if (obj.estado === 'ok') {
-                    return {
-                        fechaIni: obj.fechaIni,
-                        fechaFin: obj.fechaFin
-                    };
+                    console.log(obj.valores);
                 } else {
                     console.log(obj.error);
                 }
@@ -43,10 +35,59 @@
     }
 
 </script>
+<style>
+    #chartdiv {
+        width: 100%;
+        height: 500px;
+        margin-top: 15px;
+        margin-bottom: 15px;
+    }
 
+    .amChartsPeriodSelector {
+        float: right;
+    }
+
+    .amChartsPeriodSelector .amChartsButton {
+        padding-top: 5px;
+        padding-bottom: 3px;
+        -moz-border-radius: 0;
+        border-radius: 0;
+        border: 0;
+        border-bottom: 1px solid #dddddd;
+        outline: none;
+        background: #fff;
+        color: #000;
+    }
+
+    .amChartsPeriodSelector .amChartsButton:hover {
+        background-color: #eeeeee;
+    }
+
+    .amChartsPeriodSelector .amChartsButtonSelected {
+        background-color: #fff;
+        border: 0;
+        border-bottom: 1px solid #0088CC;
+        color: #000000;
+        padding-bottom: 3px;
+        -moz-border-radius: 0;
+        border-radius: 0;
+        margin: 1px;
+        outline: none;
+    }
+
+    .amChartsDataSetSelector {
+        padding: 5px 0 0 15px;
+    }
+</style>
 
 <div class='container-fluid'>
     <div class='row'>
-
+        <div class="col-md-12">
+            <div class="page-header">
+                <h1>
+                    Informe de carga
+                </h1>
+            </div>
+        </div>
     </div>
 </div>

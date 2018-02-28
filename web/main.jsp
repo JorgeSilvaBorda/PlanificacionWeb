@@ -17,7 +17,8 @@
             e.stopPropagation();
             e.preventDefault();
         });
-        cargarModulo("general");
+        //cargarModulo("general"); //Borrado para test. En producción, este debe ser el inicial.
+        cargarModulo("informe");
     });
 
     function cargarModulo(nombre) {
